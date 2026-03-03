@@ -18,12 +18,7 @@
 ### 编码实现
 
 - **代码文件**：[HTML 布局](./HTML布局/index.html)
-
-```html
-<p align="center">
-  <img src="./HTML布局/录屏.gif" alt="居中显示" width="60%" />
-</p>
-```
+- **案例录像**：![HTML 布局](./HTML布局/录屏.gif)
 
 ## # 资源静态问题
 
