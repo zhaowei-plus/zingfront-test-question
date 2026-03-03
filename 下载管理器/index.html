@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>素材下载管理器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 素材下载管理器</h1>
+            <p class="subtitle">VIP 批量下载工具</p>
+        </header>
+
+        <!-- 添加任务区域 -->
+        <section class="add-task-section">
+            <h2>添加下载任务</h2>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="fileUrl" 
+                    placeholder="输入素材URL (如: https://example.com/image.jpg)"
+                >
+                <input 
+                    type="text" 
+                    id="fileName" 
+                    placeholder="文件名 (可选)"
+                >
+                <button onclick="addSingleDownload()">📄 单个下载</button>
+            </div>
+            
+            <div class="batch-input">
+                <textarea 
+                    id="batchUrls" 
+                    placeholder="批量下载: 每行一个URL&#10;https://example.com/file1.jpg&#10;https://example.com/file2.jpg&#10;https://example.com/file3.png"
+                ></textarea>
+                <div class="batch-actions">
+                    <input 
+                        type="text" 
+                        id="zipName" 
+                        placeholder="ZIP文件名 (默认: batch_download.zip)"
+                    >
+                    <button onclick="addBatchDownload()">📦 批量下载</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 下载控制面板 -->
+        <section class="control-panel">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">总任务数</span>
+                    <span class="stat-value" id="totalTasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">进行中</span>
+                    <span class="stat-value" id="activeTasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">已完成</span>
+                    <span class="stat-value" id="completedTasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">并发数</span>
+                    <span class="stat-value" id="concurrentDownloads">0/5</span>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn-primary" onclick="downloadManager.startAll()">▶️ 全部开始</button>
+                <button class="btn-warning" onclick="downloadManager.pauseAll()">⏸️ 全部暂停</button>
+                <button class="btn-danger" onclick="downloadManager.clearCompleted()">🗑️ 清除已完成</button>
+            </div>
+        </section>
+
+        <!-- 下载列表 -->
+        <section class="download-list">
+            <h2>下载列表</h2>
+            <div class="list-header">
+                <div class="col-name">文件名</div>
+                <div class="col-size">大小</div>
+                <div class="col-progress">进度</div>
+                <div class="col-status">状态</div>
+                <div class="col-speed">速度</div>
+                <div class="col-action">操作</div>
+            </div>
+            <div id="taskList" class="task-list">
+                <div class="empty-state">
+                    <p>暂无下载任务</p>
+                    <p>请添加单个或批量下载任务</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- JSZip CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="download-manager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

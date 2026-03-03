@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe 3 - SaaS 服务 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2::before {
+            content: '🚀';
+        }
+
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .status-bar strong {
+            color: #38f9d7;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(67, 233, 123, 0.4);
+        }
+
+        .console-log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .console-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .console-log::-webkit-scrollbar-thumb {
+            background: #43e97b;
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .log-time {
+            color: #888;
+        }
+
+        .log-message {
+            color: #d4d4d4;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #0066cc;
+        }
+
+        .info strong {
+            color: #43e97b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>SaaS 服务 3</h2>
+        
+        <div class="status-bar">
+            当前身份: <strong>iframe3</strong><br>
+            连接状态: <span id="status">等待连接...</span>
+        </div>
+
+        <button onclick="pingMain()">Ping 主页面</button>
+
+        <div class="info">
+            <strong>测试场景:</strong><br>
+            接收来自 iframe2 的消息(通过主页面中转)
+        </div>
+
+        <div class="console-log" id="console-log"></div>
+    </div>
+
+    <script src="message-bridge.js"></script>
+    <script src="iframe3.js"></script>
+</body>
+</html>

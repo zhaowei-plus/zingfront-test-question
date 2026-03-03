@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源竞态问题解决方案</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 16px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 16px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .result-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px;
+        }
+
+        .result-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-index {
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .result-info {
+            font-size: 14px;
+        }
+
+        .result-info small {
+            color: #999;
+            font-size: 11px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding-left: 10px;
+            border-left: 2px solid #667eea;
+        }
+
+        .log-time {
+            color: #858585;
+            margin-right: 8px;
+        }
+
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-comment {
+            color: #75715e;
+        }
+
+        .code-keyword {
+            color: #f92672;
+        }
+
+        .code-function {
+            color: #66d9ef;
+        }
+
+        .code-string {
+            color: #e6db74;
+        }
+
+        .tips {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            color: #856404;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>资源竞态问题解决方案演示</h1>
+
+        <!-- Promise 方案 -->
+        <div class="section">
+            <h2>方案一：Promise 方案（队列机制）</h2>
+            <div class="description">
+                使用 Promise 和 async/await 实现队列机制。所有请求并行发送，但结果严格按照点击顺序依次处理。
+                即使先发起的请求响应较慢，也会等待其完成后再处理后续请求。
+            </div>
+
+            <div class="button-group">
+                <button class="btn" onclick="promiseSolution.requestData(1)">按钮 1</button>
+                <button class="btn" onclick="promiseSolution.requestData(2)">按钮 2</button>
+                <button class="btn" onclick="promiseSolution.requestData(3)">按钮 3</button>
+                <button class="btn" onclick="promiseSolution.requestData(4)">按钮 4</button>
+                <button class="btn" onclick="promiseSolution.requestData(5)">按钮 5</button>
+                <button class="btn" onclick="promiseSolution.requestData(6)">按钮 6</button>
+            </div>
+
+            <div class="result-container">
+                <div class="result-title">处理结果（按点击顺序）：</div>
+                <div class="result-list" id="promise-result">
+                    <div class="empty-state">暂无数据，请点击上方按钮</div>
+                </div>
+            </div>
+
+            <div class="log-container" id="promise-log">
+                <div class="log-entry"><span class="log-time">[系统]</span>等待操作...</div>
+            </div>
+
+            <div class="tips">
+                💡 测试提示：快速连续点击多个按钮（例如：3→1→5→2），观察结果严格按照点击顺序依次出现
+            </div>
+
+            <div class="code-example">
+                <span class="code-comment">// 使用示例</span><br>
+                <span class="code-keyword">const</span> solution = <span class="code-keyword">new</span> <span class="code-function">PromiseSolution</span>();<br>
+                <br>
+                <span class="code-comment">// 注册自定义更新函数</span><br>
+                solution.<span class="code-function">registerUpdateCallback</span>((data, index, waitTime) => {<br>
+                &nbsp;&nbsp;<span class="code-comment">// 在这里实现自定义的 UI 更新逻辑</span><br>
+                &nbsp;&nbsp;console.<span class="code-function">log</span>(<span class="code-string">`按钮 ${data.buttonId} 已处理（序号: ${index}）`</span>);<br>
+                &nbsp;&nbsp;<span class="code-function">updateUI</span>(data, index);<br>
+                });
+            </div>
+        </div>
+
+        <!-- 非 Promise 方案 -->
+        <div class="section">
+            <h2>方案二：非 Promise 方案（回调队列）</h2>
+            <div class="description">
+                使用传统回调函数实现队列机制。通过轮询方式检查数据是否返回，确保按顺序处理。
+                不依赖 Promise，适合需要兼容旧代码的场景。
+            </div>
+
+            <div class="button-group">
+                <button class="btn" onclick="callbackSolution.requestData(1)">按钮 1</button>
+                <button class="btn" onclick="callbackSolution.requestData(2)">按钮 2</button>
+                <button class="btn" onclick="callbackSolution.requestData(3)">按钮 3</button>
+                <button class="btn" onclick="callbackSolution.requestData(4)">按钮 4</button>
+                <button class="btn" onclick="callbackSolution.requestData(5)">按钮 5</button>
+                <button class="btn" onclick="callbackSolution.requestData(6)">按钮 6</button>
+            </div>
+
+            <div class="result-container">
+                <div class="result-title">处理结果（按点击顺序）：</div>
+                <div class="result-list" id="callback-result">
+                    <div class="empty-state">暂无数据，请点击上方按钮</div>
+                </div>
+            </div>
+
+            <div class="log-container" id="callback-log">
+                <div class="log-entry"><span class="log-time">[系统]</span>等待操作...</div>
+            </div>
+
+            <div class="tips">
+                💡 测试提示：与 Promise 方案相同，点击多个按钮观察顺序处理效果
+            </div>
+
+            <div class="code-example">
+                <span class="code-comment">// 使用示例</span><br>
+                <span class="code-keyword">const</span> solution = <span class="code-keyword">new</span> <span class="code-function">CallbackSolution</span>();<br>
+                <br>
+                <span class="code-comment">// 注册自定义更新函数</span><br>
+                solution.<span class="code-function">registerUpdateCallback</span>((data, index, waitTime) => {<br>
+                &nbsp;&nbsp;<span class="code-comment">// 在这里实现自定义的 UI 更新逻辑</span><br>
+                &nbsp;&nbsp;console.<span class="code-function">log</span>(<span class="code-string">`按钮 ${data.buttonId} 已处理（序号: ${index}）`</span>);<br>
+                &nbsp;&nbsp;<span class="code-function">updateUI</span>(data, index);<br>
+                });
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+    <script>
+        // 创建 Promise 方案实例
+        const promiseSolution = new PromiseSolution();
+        let promiseResults = [];
+
+        // 注册自定义更新函数 - Promise 方案
+        promiseSolution.registerUpdateCallback((data, index, waitTime) => {
+            console.log(`[Promise UI] 按钮 ${data.buttonId} 已处理，序号: ${index}, 等待: ${waitTime}ms`);
+
+            // 添加到结果数组
+            promiseResults.push({ data, index, waitTime });
+
+            // 更新 UI
+            updatePromiseUI();
+        });
+
+        // 创建回调方案实例
+        const callbackSolution = new CallbackSolution();
+        let callbackResults = [];
+
+        // 注册自定义更新函数 - 回调方案
+        callbackSolution.registerUpdateCallback((data, index, waitTime) => {
+            console.log(`[Callback UI] 按钮 ${data.buttonId} 已处理，序号: ${index}, 等待: ${waitTime}ms`);
+
+            // 添加到结果数组
+            callbackResults.push({ data, index, waitTime });
+
+            // 更新 UI
+            updateCallbackUI();
+        });
+
+        // 更新 Promise 方案的 UI
+        function updatePromiseUI() {
+            const resultDiv = document.getElementById('promise-result');
+            const logDiv = document.getElementById('promise-log');
+
+            if (promiseResults.length === 0) {
+                resultDiv.innerHTML = '<div class="empty-state">暂无数据，请点击上方按钮</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = promiseResults.map(item => `
+                <div class="result-item" style="border-left: 3px solid ${item.data.color}">
+                    <div class="result-index">${item.index}</div>
+                    <div class="result-info">
+                        <strong>按钮 ${item.data.buttonId}</strong><br>
+                        <small>等待 ${item.waitTime}ms</small>
+                    </div>
+                </div>
+            `).join('');
+
+            // 更新日志
+            const lastResult = promiseResults[promiseResults.length - 1];
+            addLog(logDiv, `按钮 ${lastResult.data.buttonId} 已处理（序号: ${lastResult.index}, 等待: ${lastResult.waitTime}ms）`);
+        }
+
+        // 更新回调方案的 UI
+        function updateCallbackUI() {
+            const resultDiv = document.getElementById('callback-result');
+            const logDiv = document.getElementById('callback-log');
+
+            if (callbackResults.length === 0) {
+                resultDiv.innerHTML = '<div class="empty-state">暂无数据，请点击上方按钮</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = callbackResults.map(item => `
+                <div class="result-item" style="border-left: 3px solid ${item.data.color}">
+                    <div class="result-index">${item.index}</div>
+                    <div class="result-info">
+                        <strong>按钮 ${item.data.buttonId}</strong><br>
+                        <small>等待 ${item.waitTime}ms</small>
+                    </div>
+                </div>
+            `).join('');
+
+            // 更新日志
+            const lastResult = callbackResults[callbackResults.length - 1];
+            addLog(logDiv, `按钮 ${lastResult.data.buttonId} 已处理（序号: ${lastResult.index}, 等待: ${lastResult.waitTime}ms）`);
+        }
+
+        // 添加日志
+        function addLog(logDiv, message) {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span>${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        console.log('资源竞态问题解决方案已初始化');
+        console.log('提示：快速点击多个按钮，观察结果按点击顺序依次出现');
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智线云科技 - 布局演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 18px;
+            color: #333;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+            overflow-y: auto;
+            padding-top: 60px;
+            padding-left: 220px;
+        }
+
+        /* Header 样式 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 24px;
+            z-index: 1000;
+            border-bottom: 1px solid #f4f4f4;
+        }
+
+        .header .logo {
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .header .nav {
+            margin-left: 60px;
+            display: flex;
+            flex: 1;
+            gap: 32px;
+        }
+
+        .header .nav-item {
+            position: relative;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .header .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .header .nav-item.has-dropdown:hover .dropdown-menu {
+            display: block !important;
+            animation: dropdownSlide 0.3s ease-out;
+        }
+
+        /* 下拉菜单样式 */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 20px;
+            background: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            min-width: 200px;
+            z-index: 1001;
+        }
+
+        .dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateX(-16px);
+            animation: menuItemAppear 0.3s ease-out forwards;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(90deg, #2081FF, #D900FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 下拉菜单项动画 */
+        .dropdown-item:nth-child(1) { animation-delay: 0.1s; }
+        .dropdown-item:nth-child(2) { animation-delay: 0.2s; }
+        .dropdown-item:nth-child(3) { animation-delay: 0.3s; }
+        .dropdown-item:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes menuItemAppear {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Sidebar 样式 */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 4px;
+            bottom: 4px;
+            width: 220px;
+            background: #d9d9d9;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 999;
+        }
+
+        .sidebar-section {
+            padding: 16px;
+            background-color: #FFF;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .sidebar-section.middle {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .sidebar-section.middle::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
+        .sidebar-section h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .sidebar-item {
+            padding: 12px 8px;
+            margin-bottom: 8px;
+            background: #f4f4f4;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background: #e0e0e0;
+        }
+
+        /* 高元素用于演示滚动效果 */
+        .tall-content {
+            height: 1200px;
+            background: linear-gradient(180deg, #f4f4f4, #e0e0e0);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* Content 区域样式 */
+        .content {
+            min-height: calc(100vh - 60px);
+            padding: 24px;
+            background: #f4f4f4;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">智线云科技</div>
+        <nav class="nav">
+            <div class="nav-item has-dropdown">
+                下拉菜单
+                <div class="dropdown-menu">
+                    <div class="dropdown-item">菜单项一</div>
+                    <div class="dropdown-item">菜单项二</div>
+                    <div class="dropdown-item">菜单项三</div>
+                    <div class="dropdown-item">菜单项四</div>
+                </div>
+            </div>
+        </nav>
+        <div class="user-info">管理员</div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <h3>顶部固定区域</h3>
+        </div>
+        
+        <div class="sidebar-section middle">
+            <h3>菜单滑动区域</h3>
+            <div class="sidebar-item">数据报表</div>
+            <div class="sidebar-item">趋势分析</div>
+            <!-- 高元素用于演示滚动效果 -->
+            <div class="tall-content">
+                滚动区域 - 此区域内容较长，可滚动查看
+            </div>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>设置及登出固定区域</h3>
+        </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+        <div class="content-section">
+            <h2>欢迎使用智线云科技管理系统</h2>
+            <p>这是一个演示页面，展示了Header、Sidebar和Content区域的布局效果。</p>
+        </div>
+        
+        <div class="content-section">
+            <h2>内容区域</h2>
+            <p>此区域可以放置各种业务内容，支持滚动浏览。</p>
+            <div style="height: 1200px; background: #f4f4f4; display: flex; align-items: center; justify-content: center; margin-top: 20px; border-radius: 8px;">
+                更多内容区域...
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 点击页面其他区域隐藏下拉菜单
+        document.addEventListener('click', function(e) {
+            // 检查点击的元素是否在下拉菜单区域内
+            const clickedInDropdown = e.target.closest('.dropdown-menu');
+            const clickedInNav = e.target.closest('.nav-item');
+
+            // 如果点击的不是下拉菜单或导航项，则隐藏所有下拉菜单
+            if (!clickedInDropdown && !clickedInNav) {
+                const dropdowns = document.querySelectorAll('.dropdown-menu');
+                dropdowns.forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
