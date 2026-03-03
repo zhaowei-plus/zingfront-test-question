@@ -19,6 +19,12 @@
 
 - **代码文件**：[HTML 布局](./HTML布局/index.html)
 
+```html
+<p align="center">
+  <img src="./HTML布局/录屏.gif" alt="居中显示" width="60%" />
+</p>
+```
+
 ## # 资源静态问题
 
 ## 问题描述
@@ -67,6 +73,12 @@
 
 [资源竞态问题](./资源竞态问题/index.html)
 
+```html
+<p align="center">
+  <img src="./资源竞态问题/录屏.gif" alt="居中显示" width="60%" />
+</p>
+```
+
 ## 第三题（非必答）
 
 # 多 Iframe 页面通信问题
@@ -82,6 +94,12 @@
 
 [多 Iframe 通信](./多Iframe通信/main.html)
 
+```html
+<p align="center">
+  <img src="./多Iframe通信/录屏.gif" alt="居中显示" width="60%" />
+</p>
+```
+
 ## 批量下载管理器
 
 通过分析题目是需要实现一个批量下载管理器，需要实现如下功能：
@@ -92,6 +110,16 @@
 - 支持下载失败重试
 
 在前端实现文件的基本管理，这里不使用 Worker 的原因是，文件下载属于 IO 密集型操作，而不属于 CPU 密集型操作，对 CPU 的占用率不高，使用 Worker 反而会增加 CPU 的占用率，导致页面卡顿，影响用户体验
+
+- **代码文件**
+
+[下载管理器](./下载管理器/main.html)
+
+```html
+<p align="center">
+  <img src="./下载管理器/录屏.gif" alt="居中显示" width="60%" />
+</p>
+```
 
 ## 关于 AI 分析的优缺点分析
 
